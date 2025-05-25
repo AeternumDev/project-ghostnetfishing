@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- Disable session persistence across restarts -->
+    <Manager pathname="" />
+    
+    <!-- Resource-Konfiguration für MySQL -->
+    <Resource name="jdbc/ghostnetDS"
+              auth="Container"
+              type="javax.sql.DataSource"
+              username="root"
+              password="1234"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/ghostnet_fishing?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC&amp;createDatabaseIfNotExist=true&amp;autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8"
+              maxTotal="20"
+              maxIdle="10"
+              maxWaitMillis="30000"
+              testOnBorrow="true"
+              testWhileIdle="true"
+              validationQuery="SELECT 1"
+              validationQueryTimeout="30"
+              timeBetweenEvictionRunsMillis="30000"
+              minEvictableIdleTimeMillis="600000"/>
+              
+    <!-- CDI BeanManager Resource -->
+    <Resource name="BeanManager" 
+              auth="Container"
+              type="jakarta.enterprise.inject.spi.BeanManager"
+              factory="org.jboss.weld.resources.ManagerObjectFactory"/>
+</Context>

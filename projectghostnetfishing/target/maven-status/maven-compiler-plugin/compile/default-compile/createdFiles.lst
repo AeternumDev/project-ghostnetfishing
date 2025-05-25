@@ -1,0 +1,10 @@
+com\ghostnetfishing\model\PersonType.class
+com\ghostnetfishing\model\Person.class
+com\ghostnetfishing\config\H2EntityManagerProducer.class
+com\ghostnetfishing\bean\PersonBean.class
+com\ghostnetfishing\service\GhostNetService.class
+com\ghostnetfishing\bean\GhostNetBean.class
+com\ghostnetfishing\model\GhostNet.class
+com\ghostnetfishing\Main.class
+com\ghostnetfishing\model\NetStatus.class
+com\ghostnetfishing\config\EntityManagerProducer.class

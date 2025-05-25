@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Geisternetz melden - GhostNetFishing</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .ocean-overlay {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><defs><linearGradient id="wave-gradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%23ffffff;stop-opacity:0.1"/><stop offset="100%" style="stop-color:%23ffffff;stop-opacity:0.05"/></linearGradient></defs><path fill="url(%23wave-gradient)" d="M0,200 C300,300 400,100 600,200 C800,300 900,100 1200,200 L1200,400 L0,400 Z"/></svg>') repeat-x bottom;
+            background-size: 1200px 200px;
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #e74c3c, #c0392b, #e74c3c);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-icon {
+            font-size: 2.5rem;
+            color: #e74c3c;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .form-help {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+        
+        .ui-inputfield, .ui-selectonemenu {
+            padding: 12px 15px !important;
+            border: 2px solid #e9ecef !important;
+            border-radius: 10px !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease !important;
+            background: #f8f9fa !important;
+        }
+        
+        .ui-inputfield:focus, .ui-selectonemenu:focus {
+            border-color: #e74c3c !important;
+            background: white !important;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
+        }
+        
+        .ui-selectbooleancheckbox {
+            margin-top: 10px;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+            color: white !important;
+            padding: 15px 40px !important;
+            border: none !important;
+            border-radius: 25px !important;
+            font-size: 1.1rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3) !important;
+            margin-top: 20px !important;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4) !important;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.2);
+            color: white !important;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none !important;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-top: 30px;
+        }
+        
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            color: white !important;
+        }
+        
+        .anonymous-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .checkbox-container:hover {
+            border-color: #e74c3c;
+        }
+        
+        .ui-growl {
+            z-index: 9999 !important;
+        }
+        
+        .ui-growl .ui-growl-item {
+            border-radius: 10px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        @media (max-width: 768px) {
+            .page-title { font-size: 2.5rem; }
+            .content-card { padding: 25px 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="ocean-overlay">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">🎣 Geisternetz melden</h1>
+                <p class="page-subtitle">
+                    Haben Sie ein verlassenes Fischernetz entdeckt? Helfen Sie uns, es zu lokalisieren und zu bergen. 
+                    Jede Meldung trägt zum Schutz des marinen Lebens bei.
+                </p>
+            </div>
+            
+            <div class="content-card">
+                <h2 class="section-title">
+                    <span class="section-icon">📍</span>
+                    Neues Geisternetz melden
+                </h2>
+                
+                <p:growl id="growl" showDetail="true" />
+                
+                <h:form id="reportForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <p:outputLabel for="latitude" value="Breitengrad (Latitude):" styleClass="form-label"/>
+                            <div class="form-help">Wert zwischen -90.0 und 90.0</div>
+                            <p:inputText id="latitude" value="#{ghostNetBean.newNet.latitude}" required="true" label="Breitengrad"
+                                       placeholder="z.B. 54.1234">
+                                <f:validateDoubleRange minimum="-90.0" maximum="90.0" />
+                            </p:inputText>
+                        </div>
+
+                        <div class="form-group">
+                            <p:outputLabel for="longitude" value="Längengrad (Longitude):" styleClass="form-label"/>
+                            <div class="form-help">Wert zwischen -180.0 und 180.0</div>
+                            <p:inputText id="longitude" value="#{ghostNetBean.newNet.longitude}" required="true" label="Längengrad"
+                                       placeholder="z.B. 8.5678">
+                                <f:validateDoubleRange minimum="-180.0" maximum="180.0" />
+                            </p:inputText>
+                        </div>
+
+                        <div class="form-group">
+                            <p:outputLabel for="size" value="Geschätzte Größe:" styleClass="form-label"/>
+                            <div class="form-help">z.B. 5x10m, klein, groß, mittel</div>
+                            <p:inputText id="size" value="#{ghostNetBean.newNet.estimatedSize}" required="true" label="Geschätzte Größe"
+                                       placeholder="z.B. 5x10m oder 'groß'"/>
+                        </div>
+
+                        <div class="form-group">
+                            <p:outputLabel for="status" value="Status:" styleClass="form-label"/>
+                            <p:selectOneMenu id="status" value="#{ghostNetBean.newNet.status}" required="true" label="Status">
+                                <f:selectItem itemLabel="Status auswählen..." itemValue="" />
+                                <f:selectItem itemLabel="🔴 Gemeldet" itemValue="REPORTED" />
+                                <f:selectItem itemLabel="🟡 Bergung bevorstehend" itemValue="RECOVERY_PENDING" />
+                                <f:selectItem itemLabel="🟢 Geborgen" itemValue="RECOVERED" />
+                                <f:selectItem itemLabel="❌ Verschollen" itemValue="LOST" />
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <div class="anonymous-section">
+                                <p:outputLabel value="Anonyme Meldung:" styleClass="form-label"/>
+                                <div class="checkbox-container">
+                                    <p:selectBooleanCheckbox id="anonymous" value="#{ghostNetBean.anonymousReport}" itemLabel="Ja, anonym melden">
+                                        <p:ajax update="reporterPanel"/>
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p:outputPanel id="reporterPanel">
+                        <div class="form-grid" style="#{ghostNetBean.anonymousReport ? 'display: none;' : ''}">
+                            <div class="form-group">
+                                <p:outputLabel for="reporterName" value="Ihr Name:" styleClass="form-label"/>
+                                <p:inputText id="reporterName" value="#{ghostNetBean.reportingPerson.name}" 
+                                           required="#{!ghostNetBean.anonymousReport}" label="Ihr Name"
+                                           placeholder="Ihr vollständiger Name"/>
+                            </div>
+
+                            <div class="form-group">
+                                <p:outputLabel for="reporterPhone" value="Ihre Telefonnummer:" styleClass="form-label"/>
+                                <p:inputText id="reporterPhone" value="#{ghostNetBean.reportingPerson.phoneNumber}" 
+                                           required="#{!ghostNetBean.anonymousReport}" label="Ihre Telefonnummer"
+                                           placeholder="Ihre Telefonnummer"/>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+
+                    <p:commandButton value="🚨 Geisternetz melden" action="#{ghostNetBean.reportNet}" 
+                                   update="reportForm growl @form" styleClass="submit-btn"/>
+                </h:form>
+            </div>
+
+            <h:link value="🏠 Zurück zur Startseite" outcome="index" styleClass="back-link"/>
+        </div>
+    </div>
+</h:body>
+</html>

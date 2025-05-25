@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<h:head>
+    <title>GhostNetFishing - Meeresschutz durch Geisternetz-Bergung</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .ocean-overlay {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><defs><linearGradient id="wave-gradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%23ffffff;stop-opacity:0.1"/><stop offset="100%" style="stop-color:%23ffffff;stop-opacity:0.05"/></linearGradient></defs><path fill="url(%23wave-gradient)" d="M0,200 C300,300 400,100 600,200 C800,300 900,100 1200,200 L1200,400 L0,400 Z"/></svg>') repeat-x bottom;
+            background-size: 1200px 200px;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 60px 0;
+            color: white;
+        }
+        
+        .logo {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 50px;
+            margin: 0 20px 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        }
+        
+        .welcome-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            position: relative;
+        }
+        
+        .welcome-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        .intro-text {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 50px;
+            line-height: 1.6;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .action-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .action-card:hover::before {
+            left: 100%;
+        }
+        
+        .action-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .report-card .action-icon { color: #e74c3c; }
+        .view-card .action-icon { color: #3498db; }
+        .register-card .action-icon { color: #27ae60; }
+        
+        .action-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .action-description {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .action-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .action-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .stats-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .stat-item h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-item p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .logo { font-size: 2.5rem; }
+            .main-content { padding: 30px 20px; margin: 0 10px 30px; }
+            .welcome-title { font-size: 2rem; }
+            .action-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="ocean-overlay">
+        <div class="container">
+            <header class="header">
+                <h1 class="logo">🌊 GhostNetFishing</h1>
+                <p class="subtitle">Gemeinsam für saubere Meere</p>
+                <p class="description">
+                    Helfen Sie mit, verlassene Fischernetze aus unseren Ozeanen zu entfernen und das marine Ökosystem zu schützen.
+                    Jedes geborgene Netz rettet Meeresleben und trägt zum Umweltschutz bei.
+                </p>
+            </header>
+        </div>
+        
+        <div class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h3>640.000</h3>
+                        <p>Tonnen Geisternetze jährlich</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>100+</h3>
+                        <p>Bedrohte Arten betroffen</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>10%</h3>
+                        <p>Aller Meeresabfälle</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="container">
+                <h2 class="welcome-title">Werden Sie aktiv!</h2>
+                <p class="intro-text">
+                    Wählen Sie eine der folgenden Optionen, um zum Schutz unserer Meere beizutragen.
+                    Gemeinsam können wir die Geisternetz-Problematik angehen und eine nachhaltige Zukunft schaffen.
+                </p>
+                
+                <div class="action-grid">
+                    <div class="action-card report-card">
+                        <span class="action-icon">🎣</span>
+                        <h3 class="action-title">Geisternetz melden</h3>
+                        <p class="action-description">
+                            Haben Sie ein verlassenes Fischernetz entdeckt? Melden Sie den Fundort und helfen Sie bei der Lokalisierung.
+                        </p>
+                        <h:link styleClass="action-link" value="Netz melden" outcome="reportNet" />
+                    </div>
+                    
+                    <div class="action-card view-card">
+                        <span class="action-icon">🗺️</span>
+                        <h3 class="action-title">Gemeldete Netze anzeigen</h3>
+                        <p class="action-description">
+                            Sehen Sie alle gemeldeten Geisternetze auf einer interaktiven Karte und verfolgen Sie den Bergungsfortschritt.
+                        </p>
+                        <h:link styleClass="action-link" value="Netze anzeigen" outcome="viewNets" />
+                    </div>
+                    
+                    <div class="action-card register-card">
+                        <span class="action-icon">⚓</span>
+                        <h3 class="action-title">Als Berger registrieren</h3>
+                        <p class="action-description">
+                            Werden Sie Teil unseres Berger-Teams und helfen Sie aktiv bei der Entfernung von Geisternetzen.
+                        </p>
+                        <h:link styleClass="action-link" value="Registrieren" outcome="registerRecoverer" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

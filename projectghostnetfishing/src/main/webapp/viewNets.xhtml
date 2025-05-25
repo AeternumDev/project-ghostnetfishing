@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Geisternetze anzeigen - GhostNetFishing</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .ocean-overlay {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><defs><linearGradient id="wave-gradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%23ffffff;stop-opacity:0.1"/><stop offset="100%" style="stop-color:%23ffffff;stop-opacity:0.05"/></linearGradient></defs><path fill="url(%23wave-gradient)" d="M0,200 C300,300 400,100 600,200 C800,300 900,100 1200,200 L1200,400 L0,400 Z"/></svg>') repeat-x bottom;
+            background-size: 1200px 200px;
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2980b9, #3498db);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-icon {
+            font-size: 2.5rem;
+            color: #3498db;
+        }
+        
+        .data-table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .ui-datatable .ui-datatable-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+            color: white !important;
+            font-weight: bold !important;
+            padding: 20px !important;
+            border: none !important;
+        }
+        
+        .ui-datatable .ui-datatable-thead > tr > th {
+            background: #34495e !important;
+            color: white !important;
+            padding: 15px 10px !important;
+            font-weight: bold !important;
+            border: none !important;
+            font-size: 0.9rem !important;
+        }
+        
+        .ui-datatable .ui-datatable-tbody > tr > td {
+            padding: 15px 10px !important;
+            border-bottom: 1px solid #e9ecef !important;
+            border-left: none !important;
+            border-right: none !important;
+            font-size: 0.9rem !important;
+        }
+        
+        .ui-datatable .ui-datatable-tbody > tr:hover {
+            background: #f8f9fa !important;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-reported { background: #ffe6e6; color: #c0392b; }
+        .status-pending { background: #fff3cd; color: #e67e22; }
+        .status-recovered { background: #d4edda; color: #27ae60; }
+        .status-lost { background: #f8d7da; color: #721c24; }
+        
+        .action-btn {
+            padding: 8px 15px !important;
+            border: none !important;
+            border-radius: 20px !important;
+            font-size: 0.8rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin: 2px !important;
+        }
+        
+        .btn-assign {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+            color: white !important;
+        }
+        
+        .btn-recover {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%) !important;
+            color: white !important;
+        }
+        
+        .btn-lost {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%) !important;
+            color: white !important;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            padding: 15px 30px !important;
+            border: none !important;
+            border-radius: 25px !important;
+            font-size: 1.1rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin-bottom: 30px !important;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.2);
+            color: white !important;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none !important;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-top: 30px;
+        }
+        
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            color: white !important;
+        }
+        
+        .ui-dialog .ui-dialog-titlebar {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        
+        .ui-dialog .ui-dialog-content {
+            border-radius: 0 0 15px 15px !important;
+            padding: 30px !important;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .ui-inputfield, .ui-selectonemenu {
+            padding: 10px 12px !important;
+            border: 2px solid #e9ecef !important;
+            border-radius: 8px !important;
+            font-size: 0.9rem !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .ui-inputfield:focus, .ui-selectonemenu:focus {
+            border-color: #3498db !important;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+        }
+        
+        .dialog-btn {
+            padding: 10px 20px !important;
+            border: none !important;
+            border-radius: 20px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin: 5px !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+            color: white !important;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6 !important;
+            color: white !important;
+        }
+        
+        .ui-growl {
+            z-index: 9999 !important;
+        }
+        
+        .ui-growl .ui-growl-item {
+            border-radius: 10px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        @media (max-width: 768px) {
+            .page-title { font-size: 2.5rem; }
+            .content-card { padding: 25px 20px; }
+            .ui-datatable .ui-datatable-thead > tr > th,
+            .ui-datatable .ui-datatable-tbody > tr > td {
+                padding: 10px 5px !important;
+                font-size: 0.8rem !important;
+            }
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="ocean-overlay">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">🗺️ Geisternetze Übersicht</h1>
+                <p class="page-subtitle">
+                    Verwalten Sie alle gemeldeten Geisternetze, weisen Sie sie Bergern zu und verfolgen Sie den Fortschritt. 
+                    Gemeinsam sorgen wir für saubere Meere.
+                </p>
+            </div>
+            
+            <p:growl id="growl" showDetail="true" />
+            
+            <h:form id="netsForm">
+                <p:commandButton value="🔄 Listen aktualisieren" action="#{ghostNetBean.loadAllNets}" 
+                               update="netsTable netsToRecoverTable assignNetForm lostNetForm" 
+                               styleClass="refresh-btn"/>
+
+                <div class="content-card">
+                    <h2 class="section-title">
+                        <span class="section-icon">📋</span>
+                        Alle gemeldeten Geisternetze
+                    </h2>
+                    
+                    <div class="data-table-container">
+                        <p:dataTable id="netsTable" var="net" value="#{ghostNetBean.allNets}" 
+                                   paginator="true" rows="10" styleClass="modern-table">
+                            <p:column headerText="ID" style="width: 60px;">
+                                <h:outputText value="#{net.id}" />
+                            </p:column>
+                            <p:column headerText="Standort">
+                                <h:outputText value="#{net.latitude}, #{net.longitude}" />
+                            </p:column>
+                            <p:column headerText="Größe">
+                                <h:outputText value="#{net.estimatedSize}" />
+                            </p:column>
+                            <p:column headerText="Status">
+                                <span class="status-badge #{net.status == 'REPORTED' ? 'status-reported' : net.status == 'RECOVERY_PENDING' ? 'status-pending' : net.status == 'RECOVERED' ? 'status-recovered' : 'status-lost'}">
+                                    <h:outputText value="#{net.status == 'REPORTED' ? 'Gemeldet' : net.status == 'RECOVERY_PENDING' ? 'Bergung läuft' : net.status == 'RECOVERED' ? 'Geborgen' : 'Verschollen'}" />
+                                </span>
+                            </p:column>
+                            <p:column headerText="Gemeldet von">
+                                <h:outputText value="#{net.reportingPerson != null ? net.reportingPerson.name : 'Anonym'}" />
+                            </p:column>
+                            <p:column headerText="Berger">
+                                <h:outputText value="#{net.recoveringPerson != null ? net.recoveringPerson.name : 'Nicht zugewiesen'}" />
+                            </p:column>
+                            <p:column headerText="Aktionen" style="width: 200px;">
+                                <p:commandButton value="👤 Zuweisen" icon="pi pi-user-plus" 
+                                               rendered="#{net.status == 'REPORTED'}"
+                                               action="#{ghostNetBean.setSelectedNet(net)}"
+                                               oncomplete="PF('assignDialog').show()" 
+                                               update=":assignNetForm"
+                                               styleClass="action-btn btn-assign">
+                                </p:commandButton>
+
+                                <p:commandButton value="✅ Geborgen" icon="pi pi-check-circle" 
+                                               rendered="#{net.status == 'RECOVERY_PENDING' and net.recoveringPerson != null}"
+                                               action="#{ghostNetBean.markAsRecovered(net)}" 
+                                               update="netsForm growl"
+                                               styleClass="action-btn btn-recover">
+                                     <f:setPropertyActionListener target="#{ghostNetBean.selectedNet}" value="#{net}" />
+                                </p:commandButton>
+
+                                <p:commandButton value="❓ Verschollen" icon="pi pi-question-circle" 
+                                               rendered="#{net.status == 'REPORTED' or net.status == 'RECOVERY_PENDING'}"
+                                               action="#{ghostNetBean.setSelectedNet(net)}"
+                                               oncomplete="PF('lostDialog').show()" 
+                                               update=":lostNetForm"
+                                               styleClass="action-btn btn-lost">
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h2 class="section-title">
+                        <span class="section-icon">⚓</span>
+                        Netze in Bergung
+                    </h2>
+                    
+                    <div class="data-table-container">
+                        <p:dataTable id="netsToRecoverTable" var="net" value="#{ghostNetBean.netsToRecover}" 
+                                   paginator="true" rows="5" styleClass="modern-table">
+                             <p:column headerText="ID" style="width: 60px;">
+                                <h:outputText value="#{net.id}" />
+                            </p:column>
+                            <p:column headerText="Standort">
+                                <h:outputText value="#{net.latitude}, #{net.longitude}" />
+                            </p:column>
+                            <p:column headerText="Größe">
+                                <h:outputText value="#{net.estimatedSize}" />
+                            </p:column>
+                            <p:column headerText="Zugewiesener Berger">
+                                <h:outputText value="#{net.recoveringPerson.name}" />
+                            </p:column>
+                             <p:column headerText="Aktionen">
+                                <p:commandButton value="✅ Als geborgen markieren" icon="pi pi-check-circle" 
+                                               action="#{ghostNetBean.markAsRecovered(net)}" 
+                                               update="netsForm growl"
+                                               styleClass="action-btn btn-recover">
+                                     <f:setPropertyActionListener target="#{ghostNetBean.selectedNet}" value="#{net}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                </div>
+            </h:form>            <p:dialog header="🎯 Netz zur Bergung zuweisen" widgetVar="assignDialog" modal="true" 
+                     showEffect="fade" hideEffect="fade" resizable="false" width="500">
+                <h:form id="assignNetForm">
+                    <p:outputPanel rendered="#{ghostNetBean.selectedNet != null}">
+                        <p style="margin-bottom: 20px; font-size: 1.1rem;">
+                            <strong>Netz ID:</strong> #{ghostNetBean.selectedNet.id}<br/>
+                            <strong>Größe:</strong> #{ghostNetBean.selectedNet.estimatedSize}
+                        </p>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <p:outputLabel for="recoverer" value="Berger auswählen:" styleClass="form-label"/>
+                                <p:selectOneMenu id="recoverer" value="#{ghostNetBean.selectedRecovererId}" required="true">
+                                    <f:selectItem itemLabel="Berger auswählen..." itemValue="" />
+                                    <f:selectItems value="#{ghostNetBean.availableRecoverers}" var="p" 
+                                                 itemLabel="#{p.name} (ID: #{p.id})" itemValue="#{p.id}"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 30px; text-align: center;">
+                            <p:commandButton value="✅ Zuweisen" actionListener="#{ghostNetBean.assignNetToRecoverer}" 
+                                           update=":netsForm:netsTable :netsForm:netsToRecoverTable :growl" 
+                                           oncomplete="PF('assignDialog').hide();" 
+                                           styleClass="dialog-btn btn-primary"/>
+                            <p:commandButton value="❌ Abbrechen" type="button" onclick="PF('assignDialog').hide()" 
+                                           styleClass="dialog-btn btn-secondary"/>
+                        </div>
+                    </p:outputPanel>
+                </h:form>
+            </p:dialog>
+
+            <p:dialog header="⚠️ Netz als verschollen melden" widgetVar="lostDialog" modal="true" 
+                     showEffect="fade" hideEffect="fade" resizable="false" width="500">
+                <h:form id="lostNetForm">
+                     <p:outputPanel rendered="#{ghostNetBean.selectedNet != null}">
+                        <p style="margin-bottom: 20px; font-size: 1.1rem;">
+                            <strong>Netz ID:</strong> #{ghostNetBean.selectedNet.id} als verschollen markieren
+                        </p>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <p:outputLabel for="lostReporterName" value="Ihr Name:" styleClass="form-label"/>
+                                <p:inputText id="lostReporterName" value="#{ghostNetBean.lostReportPerson.name}" 
+                                           required="true" label="Ihr Name" placeholder="Ihr vollständiger Name"/>
+                            </div>
+
+                            <div class="form-group">
+                                <p:outputLabel for="lostReporterPhone" value="Ihre Telefonnummer:" styleClass="form-label"/>
+                                <p:inputText id="lostReporterPhone" value="#{ghostNetBean.lostReportPerson.phoneNumber}" 
+                                           required="true" label="Ihre Telefonnummer" placeholder="Ihre Telefonnummer"/>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 30px; text-align: center;">
+                            <p:commandButton value="⚠️ Als verschollen bestätigen" 
+                                           action="#{ghostNetBean.markAsLost(ghostNetBean.selectedNet)}" 
+                                           update=":netsForm:netsTable :netsForm:netsToRecoverTable :growl lostNetForm"
+                                           oncomplete="PF('lostDialog').hide();" 
+                                           styleClass="dialog-btn btn-primary"/>
+                            <p:commandButton value="❌ Abbrechen" type="button" onclick="PF('lostDialog').hide()" 
+                                           styleClass="dialog-btn btn-secondary"/>
+                        </div>
+                    </p:outputPanel>
+                </h:form>
+            </p:dialog>
+
+            <h:link value="🏠 Zurück zur Startseite" outcome="index" styleClass="back-link"/>
+        </div>
+    </div>
+</h:body>
+</html>

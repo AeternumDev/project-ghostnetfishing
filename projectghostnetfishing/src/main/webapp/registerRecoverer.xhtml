@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Berger registrieren - GhostNetFishing</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .ocean-overlay {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><defs><linearGradient id="wave-gradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%23ffffff;stop-opacity:0.1"/><stop offset="100%" style="stop-color:%23ffffff;stop-opacity:0.05"/></linearGradient></defs><path fill="url(%23wave-gradient)" d="M0,200 C300,300 400,100 600,200 C800,300 900,100 1200,200 L1200,400 L0,400 Z"/></svg>') repeat-x bottom;
+            background-size: 1200px 200px;
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #27ae60, #2ecc71, #27ae60);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-icon {
+            font-size: 2.5rem;
+            color: #27ae60;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .ui-inputfield {
+            padding: 12px 15px !important;
+            border: 2px solid #e9ecef !important;
+            border-radius: 10px !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease !important;
+            background: #f8f9fa !important;
+        }
+        
+        .ui-inputfield:focus {
+            border-color: #27ae60 !important;
+            background: white !important;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1) !important;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%) !important;
+            color: white !important;
+            padding: 15px 40px !important;
+            border: none !important;
+            border-radius: 25px !important;
+            font-size: 1.1rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3) !important;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4) !important;
+        }
+        
+        .data-table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .ui-datatable .ui-datatable-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+            color: white !important;
+            font-weight: bold !important;
+            padding: 20px !important;
+            border: none !important;
+        }
+        
+        .ui-datatable .ui-datatable-thead > tr > th {
+            background: #34495e !important;
+            color: white !important;
+            padding: 15px !important;
+            font-weight: bold !important;
+            border: none !important;
+        }
+        
+        .ui-datatable .ui-datatable-tbody > tr > td {
+            padding: 15px !important;
+            border-bottom: 1px solid #e9ecef !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+        
+        .ui-datatable .ui-datatable-tbody > tr:hover {
+            background: #f8f9fa !important;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+            color: white !important;
+            padding: 12px 25px !important;
+            border: none !important;
+            border-radius: 20px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin-top: 20px !important;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3) !important;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.2);
+            color: white !important;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none !important;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-top: 30px;
+        }
+        
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            color: white !important;
+        }
+        
+        .ui-growl {
+            z-index: 9999 !important;
+        }
+        
+        .ui-growl .ui-growl-item {
+            border-radius: 10px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        @media (max-width: 768px) {
+            .page-title { font-size: 2.5rem; }
+            .content-card { padding: 25px 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="ocean-overlay">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">⚓ Berger Registration</h1>
+                <p class="page-subtitle">
+                    Werden Sie Teil unseres Teams und helfen Sie aktiv bei der Bergung von Geisternetzen. 
+                    Ihre Unterstützung trägt zum Schutz des marinen Ökosystems bei.
+                </p>
+            </div>
+            
+            <div class="content-card">
+                <h2 class="section-title">
+                    <span class="section-icon">👤</span>
+                    Neue Registrierung
+                </h2>                
+                <p:growl id="growl" showDetail="true" />
+                
+                <h:form id="registerRecovererForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <p:outputLabel for="name" value="Vollständiger Name:" styleClass="form-label"/>
+                            <p:inputText id="name" value="#{personBean.newPerson.name}" required="true" label="Name" 
+                                       placeholder="Ihr vollständiger Name"/>
+                        </div>
+
+                        <div class="form-group">
+                            <p:outputLabel for="phone" value="Telefonnummer:" styleClass="form-label"/>
+                            <p:inputText id="phone" value="#{personBean.newPerson.phoneNumber}" required="true" label="Telefonnummer" 
+                                       placeholder="Ihre Telefonnummer"/>
+                        </div>
+                    </div>
+                    
+                    <p:commandButton value="🚢 Als Berger registrieren" action="#{personBean.createRecoverer}" 
+                                   update="registerRecovererForm growl recoverersListForm:recoverersTable" 
+                                   styleClass="submit-btn"/>
+                </h:form>
+            </div>
+
+            <div class="content-card">
+                <h2 class="section-title">
+                    <span class="section-icon">📋</span>
+                    Registrierte Berger
+                </h2>
+                
+                <h:form id="recoverersListForm">
+                    <div class="data-table-container">
+                        <p:dataTable id="recoverersTable" var="recoverer" value="#{personBean.recoverers}" 
+                                   paginator="true" rows="10" styleClass="modern-table">
+                            <p:column headerText="ID" style="width: 80px;">
+                                <h:outputText value="#{recoverer.id}" />
+                            </p:column>
+                            <p:column headerText="Name">
+                                <h:outputText value="#{recoverer.name}" />
+                            </p:column>
+                            <p:column headerText="Telefonnummer">
+                                <h:outputText value="#{recoverer.phoneNumber}" />
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                    
+                    <p:commandButton value="🔄 Liste aktualisieren" action="#{personBean.loadRecoverers}" 
+                                   update="recoverersTable" styleClass="refresh-btn"/>
+                </h:form>
+            </div>
+
+            <h:link value="🏠 Zurück zur Startseite" outcome="index" styleClass="back-link"/>
+        </div>
+    </div>
+</h:body>
+</html>
