@@ -14,7 +14,7 @@ ghostnetfishing_db
 - **Host**: localhost
 - **Port**: 3306
 - **Benutzer**: root
-- **Passwort**: 1234
+- **Passwort**: 1234 (Ihr Passwort wählen!)
 - **Schema**: ghostnetfishing_db
 
 ## Datenbank-Initialisierung
