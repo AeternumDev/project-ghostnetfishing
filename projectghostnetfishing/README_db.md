@@ -110,17 +110,3 @@ Das System unterstützt:
 ### Encoding-Probleme
 - Die Datenbank ist auf UTF8MB4 konfiguriert für vollständige Unicode-Unterstützung
 - Dies ermöglicht Emojis und internationale Zeichen
-
-## Daten-Beispiele
-
-Nach dem ersten Start können Sie Testdaten eingeben:
-
-### Berger registrieren
-1. Gehen Sie zu `/registerRecoverer.xhtml`
-2. Registrieren Sie einige Berger
-
-### Geisternetz melden
-1. Gehen Sie zu `/reportNet.xhtml`
-2. Melden Sie Geisternetze mit verschiedenen Status
-
-Das System persistiert alle Daten automatisch in der MySQL-Datenbank.
